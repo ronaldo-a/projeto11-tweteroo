@@ -18,11 +18,13 @@ server.post("/sign-up", (req, res) => {
 })
 
 server.post("/tweets", (req, res) => {
-    if (tweets.length === 10) {
-        tweets.splice(0, 1);
-    }
     req.body.avatar = avatar;
-    tweets.push(req.body);
+    if (tweets.length === 10) {
+        tweets.pop();
+        tweets.splice(0, 0, req.body);
+    } else {
+        tweets.splice(0, 0, req.body);
+    }
     res.send("OK")
 })
 
