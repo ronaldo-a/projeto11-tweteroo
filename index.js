@@ -12,24 +12,48 @@ let avatar;
 const tweets = [];
 
 server.post("/sign-up", (req, res) => {
-    users.push(req.body);
-    avatar = req.body.avatar
-    res.send("OK");
+    if (req.body.username && req.body.avatar) {
+        users.push(req.body);
+        avatar = req.body.avatar;
+        return res.status(201).send("OK");
+    } else {
+        res.status(400).send({"erro": "Todos os campos são obrigatórios!"});
+    }
+    
 })
 
 server.post("/tweets", (req, res) => {
     req.body.avatar = avatar;
-    if (tweets.length === 10) {
-        tweets.pop();
-        tweets.splice(0, 0, req.body);
+    if (req.body.tweet && req.body.username) {
+        if (tweets.length === 10) {
+            tweets.pop();
+            tweets.splice(0, 0, req.body);
+        } else {
+            tweets.splice(0, 0, req.body);
+        }
+        return res.status(201).send("OK");
     } else {
-        tweets.splice(0, 0, req.body);
+        res.status(400).send({"erro": "Todos os campos são obrigatórios!"});
     }
-    res.send("OK")
+    
 })
 
 server.get("/tweets", (req, res) => {
-   res.send(tweets)
+    if (req.params.username) {
+        let filteredTweets = tweets.filter(tweet => tweet.username === req.params.username);
+        return res.send(filteredTweets);
+    } else {
+        res.send(tweets)
+    }
+})
+
+server.get("/tweets/:username", (req, res) => {
+    if (req.params.username) {
+        let filteredTweets = tweets.filter(tweet => tweet.username === req.params.username);
+        return res.send(filteredTweets);
+    } else {
+        res.send(tweets)
+    }
 })
 
 server.listen(5000, () => {console.log("foiiii")})
