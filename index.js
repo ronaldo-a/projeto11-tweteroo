@@ -23,13 +23,12 @@ server.post("/sign-up", (req, res) => {
 })
 
 server.post("/tweets", (req, res) => {
-    req.body.avatar = avatar;
-    if (req.body.tweet && req.body.username) {
+    if (req.body.tweet && req.headers.user) {
+        const tweet = {"tweet": req.body.tweet, "username": req.headers.user, "avatar": avatar}
         if (tweets.length === 10) {
-            tweets.pop();
-            tweets.splice(0, 0, req.body);
+            tweets.splice(0, 0, tweet);
         } else {
-            tweets.splice(0, 0, req.body);
+            tweets.splice(0, 0, tweet);
         }
         return res.status(201).send("OK");
     } else {
@@ -39,12 +38,13 @@ server.post("/tweets", (req, res) => {
 })
 
 server.get("/tweets", (req, res) => {
-    if (req.params.username) {
-        let filteredTweets = tweets.filter(tweet => tweet.username === req.params.username);
-        return res.send(filteredTweets);
+    const page = parseInt(req.query.page);
+    if (page >= 1) {
+        const pageTweets = tweets.slice(page*10 - 10, page*10);
+        return res.send(pageTweets);
     } else {
-        res.send(tweets)
-    }
+        res.status(400).send({"Erro": "Informe uma página válida!"})
+    }     
 })
 
 server.get("/tweets/:username", (req, res) => {
@@ -56,4 +56,4 @@ server.get("/tweets/:username", (req, res) => {
     }
 })
 
-server.listen(5000, () => {console.log("foiiii")})
+server.listen(5000, () => {console.log("on air")})
